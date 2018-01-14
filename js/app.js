@@ -1,12 +1,16 @@
 const bugImage = 'images/enemy-bug.png';
 const CELL_WIDTH = 101;
 const CELL_HEIGHT = 83;
+const BUG_START_X = -CELL_WIDTH;
+const PLAYER_START_X = CELL_WIDTH * 2;
+const PLAYER_MAX_Y = CELL_HEIGHT * 5;
+
 // Game objects
 var GameObject = function(image, x, y) {
     this.sprite = image;
     this.x = x;
     this.y = y;
-}
+};
 
 // Draw the enemy on the screen, required method for game
 GameObject.prototype.render = function() {
@@ -16,7 +20,7 @@ GameObject.prototype.render = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Enemies our player must avoid
 var Enemy = function(image, x, y) {
@@ -31,31 +35,32 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.x = this.x >= ctx.canvas.width ? -CELL_WIDTH : this.x + this.speed * dt;
-}
+    this.x = this.x >= ctx.canvas.width ? BUG_START_X : this.x + this.speed * dt;
+};
 Enemy.prototype.setSpeed = function(speed) {
     this.speed = speed;
-}
+};
 
 // Now write your own player class
-Player = function(image, x, y) {
+var Player = function(image, x, y) {
     GameObject.call(this, image, x, y);
-}
+};
 Player.prototype = Object.create(GameObject.prototype);
 Player.prototype.constructor = Player;
 Player.prototype.update = function() {
-    if (this.x >= ctx.canvas.width) {
-        this.x = ctx.canvas.width - CELL_WIDTH;
-    } else if (this.x <= 0) {
+    const PLAYER_MAX_X = ctx.canvas.width - CELL_WIDTH;
+    if (this.x > PLAYER_MAX_X) {
+        this.x = PLAYER_MAX_X;
+    } else if (this.x < 0) {
         this.x = 0;
     }
 
-    if (this.y >= CELL_HEIGHT * 5) {
-        this.y = CELL_HEIGHT * 5;
+    if (this.y > PLAYER_MAX_Y) {
+        this.y = PLAYER_MAX_Y;
     } else if (this.y <= 0) {
         this.y = 0
     }
-}
+};
 Player.prototype.handleInput = function(key) {
     switch (key) {
         case 'left':
@@ -73,7 +78,7 @@ Player.prototype.handleInput = function(key) {
         default:
             break;
     }
-}
+};
 // This class requires an update(), render() and
 // a handleInput() method.
 
@@ -81,14 +86,15 @@ Player.prototype.handleInput = function(key) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 allEnemies = [];
-var bugLevel1 = new Enemy(bugImage, -CELL_WIDTH, 0);
+
+var bugLevel1 = new Enemy(bugImage, BUG_START_X, 0);
 bugLevel1.setSpeed(50);
-var bugLevel2 = new Enemy(bugImage, -CELL_WIDTH, CELL_HEIGHT);
+var bugLevel2 = new Enemy(bugImage, BUG_START_X, CELL_HEIGHT);
 bugLevel2.setSpeed(50 * 2);
 allEnemies.push(bugLevel1);
 allEnemies.push(bugLevel2);
 // Place the player object in a variable called player
-player = new Player('images/char-boy.png', CELL_WIDTH * 2, CELL_HEIGHT * 5);
+player = new Player('images/char-boy.png', PLAYER_START_X, PLAYER_MAX_Y);
 
 
 
