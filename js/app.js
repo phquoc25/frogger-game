@@ -22,6 +22,25 @@ GameObject.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+GameObject.prototype.getLeft = function () {
+    return this.x;
+};
+
+GameObject.prototype.getRight = function () {
+    return this.x + CELL_WIDTH;
+};
+
+GameObject.prototype.getCurrentRow = function () {
+    return this.y;
+};
+
+GameObject.prototype.checkCollision = function (otherGameObj) {
+    return this.getCurrentRow() === otherGameObj.getCurrentRow() &&
+        this.getRight() - CELL_WIDTH / 2 >= otherGameObj.getLeft() &&
+        this.getLeft() + CELL_WIDTH / 2 <= otherGameObj.getRight();
+
+};
+
 // Enemies our player must avoid
 var Enemy = function(image, x, y) {
     GameObject.call(this, image, x, y);
@@ -36,6 +55,11 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x = this.x >= ctx.canvas.width ? BUG_START_X : this.x + this.speed * dt;
+
+    //handle collision
+    if (this.checkCollision(player)) {
+        player.reset();
+    }
 };
 Enemy.prototype.setSpeed = function(speed) {
     this.speed = speed;
@@ -78,6 +102,11 @@ Player.prototype.handleInput = function(key) {
         default:
             break;
     }
+};
+
+Player.prototype.reset = function () {
+    this.x = PLAYER_START_X;
+    this.y = PLAYER_MAX_Y;
 };
 // This class requires an update(), render() and
 // a handleInput() method.
